@@ -14,12 +14,50 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   name         String
-  email        String   @unique
-  username     String   @unique
+  email        String    @unique
+  username     String    @unique
   password     String
   refreshToken String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  Post         Post[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Comment      Comment[]
+  Like         Like[]
+}
+
+model Post {
+  id           String    @id @default(uuid())
+  title        String
+  description  String
+  image_url    String
+  is_published Boolean   @default(false)
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  Comment      Comment[]
+  Like         Like[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
