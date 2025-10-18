@@ -4,14 +4,25 @@ import cors from "cors";
 import methodOverride from "method-override";
 import authRoutes from "@routes/auth.routes";
 import userRoutes from "@routes/user.routes";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(express.json()); // this app level express middleware parses form data to req.body
-app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names
+app.use(express.urlencoded({ extended: true })); // reads and turns html form submissions into nice JS objects
 app.use(methodOverride("_method")); // look for ?_method=PUT in POST requests
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // your frontend url
+      // 'https://mywebsite.com' // your production url optional
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/api/auth", authRoutes);

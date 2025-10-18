@@ -13,7 +13,8 @@ const authenticateUser = async (
   next: NextFunction
 ) => {
   // 1. Extract the access token from the HttpOnly cookie
-  const token = req.cookies.accessToken;
+  const token = req.cookies?.accessToken;
+  console.log("Cookies", req, req.cookies);
 
   if (!token) {
     return Send.unauthorized(res, null);
@@ -40,7 +41,7 @@ const refreshTokenValidation = async (
   next: NextFunction
 ) => {
   // 1. Extract the refresh token from the HttpOnly cookie
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.cookies?.refreshToken;
 
   // If there is no refresh token, return an error
   if (!refreshToken) {

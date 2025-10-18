@@ -29,7 +29,6 @@ const routes: RouteConfig[] = [
     ],
     handler: authController.logout,
   },
-
   {
     // refresh token
     method: "post",
