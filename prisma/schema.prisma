@@ -31,8 +31,8 @@ model Post {
   id           String    @id @default(uuid())
   title        String
   description  String
-  image_url    String
-  is_published Boolean   @default(false)
+  image_url    String?
+  is_published Boolean?  @default(false)
   user         User      @relation(fields: [userId], references: [id])
   userId       String
   createdAt    DateTime  @default(now())

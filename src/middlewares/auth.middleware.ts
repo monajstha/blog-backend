@@ -14,7 +14,6 @@ const authenticateUser = async (
 ) => {
   // 1. Extract the access token from the HttpOnly cookie
   const token = req.cookies?.accessToken;
-  console.log("Cookies", req, req.cookies);
 
   if (!token) {
     return Send.unauthorized(res, null);

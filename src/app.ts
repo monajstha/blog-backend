@@ -1,10 +1,11 @@
 import { errorHandler } from "@middlewares/errorHandler";
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import methodOverride from "method-override";
 import authRoutes from "@routes/auth.routes";
 import userRoutes from "@routes/user.routes";
-import cookieParser from "cookie-parser";
+import postRoutes from "@routes/post.routes";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/posts", postRoutes);
 
 // Handle all unmatched routes
 app.use((req: Request, res: Response, next: NextFunction) => {
