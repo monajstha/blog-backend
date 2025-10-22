@@ -9,8 +9,13 @@ const post = z.object({
   is_published: z.boolean().optional(),
 });
 
+const comment = z.object({
+  text: z.string().min(1, "Comment must be at least one character long"),
+});
+
 const postSchema = {
   post,
+  comment,
 };
 
 export default postSchema;

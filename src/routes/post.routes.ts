@@ -22,6 +22,37 @@ const routes: RouteConfig[] = [
     ],
     handler: postController.insertNewPost,
   },
+  {
+    // add comment on a post
+    method: "post",
+    path: "/:post_id/comments/new",
+    middlewares: [
+      authMiddleware.authenticateUser,
+      validationMiddleware.validateBody(postSchema.comment),
+    ],
+    handler: postController.insertNewComment,
+  },
+  {
+    // get all comments of a post
+    method: "get",
+    path: "/:post_id/comments",
+    middlewares: [authMiddleware.authenticateUser],
+    handler: postController.getAllCommentsOfAPost,
+  },
+  {
+    // add comment on a post
+    method: "post",
+    path: "/:post_id/likes/new",
+    middlewares: [authMiddleware.authenticateUser],
+    handler: postController.insertNewLike,
+  },
+  {
+    // get all comments of a post
+    method: "get",
+    path: "/:post_id/likes",
+    middlewares: [authMiddleware.authenticateUser],
+    handler: postController.getAllLikesOfAPost,
+  },
 ];
 
 export default createRouter(routes);
