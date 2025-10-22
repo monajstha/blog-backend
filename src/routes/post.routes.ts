@@ -18,9 +18,26 @@ const routes: RouteConfig[] = [
     path: "/new",
     middlewares: [
       authMiddleware.authenticateUser,
-      validationMiddleware.validateBody(postSchema.post),
+      validationMiddleware.validateBody(postSchema.create),
     ],
     handler: postController.insertNewPost,
+  },
+  {
+    // Update a post
+    method: "patch",
+    path: "/:post_id",
+    middlewares: [
+      authMiddleware.authenticateUser,
+      validationMiddleware.validateBody(postSchema.update),
+    ],
+    handler: postController.updatePost,
+  },
+  {
+    // Update a post
+    method: "delete",
+    path: "/:post_id",
+    middlewares: [authMiddleware.authenticateUser],
+    handler: postController.deletePost,
   },
   {
     // add comment on a post

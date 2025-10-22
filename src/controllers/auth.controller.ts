@@ -3,7 +3,7 @@ import { prisma } from "@db/index";
 import { Request, Response } from "express";
 import authSchema from "validations/auth.schema";
 import bcrypt from "bcrypt";
-import { z } from "zod/v3";
+import { z } from "zod";
 import jwt from "jsonwebtoken";
 import authConfig from "@config/auth.config";
 

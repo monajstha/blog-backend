@@ -1,8 +1,8 @@
 import Send from "@utils/response.utils";
 import { Request, Response, NextFunction } from "express";
-import { ZodError, ZodSchema } from "zod/v3";
+import { ZodError, ZodType } from "zod";
 
-const validateBody = (schema: ZodSchema) => {
+const validateBody = (schema: ZodType<any>) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse(req.body);
@@ -12,7 +12,7 @@ const validateBody = (schema: ZodSchema) => {
         // Format errors like {email: ['error1', 'error2'], password: ['error1']}
         const formattedErrors: Record<string, string[]> = {};
 
-        error.errors.forEach((err) => {
+        error.issues.forEach((err) => {
           const field = err.path.join(".");
           if (!formattedErrors[field]) {
             formattedErrors[field] = [];

@@ -27,7 +27,7 @@ app.use(
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 
 // Handle all unmatched routes
