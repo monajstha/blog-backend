@@ -33,26 +33,49 @@ const insertNewPost = async (req: Request, res: Response) => {
 
 const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const { published } = req?.query;
+    const { published, page = "1", limit = "10" } = req?.query;
+
+    const pageNumber = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
+
+    const skip = (pageNumber - 1) * pageSize;
 
     const isPublished = published !== undefined ? true : undefined;
 
-    const allPosts = await prisma.post.findMany({
-      where: isPublished !== undefined ? { is_published: isPublished } : {},
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
+    const [posts, totalPosts] = await Promise.all([
+      prisma.post.findMany({
+        where: isPublished !== undefined ? { is_published: isPublished } : {},
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+            },
           },
         },
-      },
-    });
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: pageSize,
+      }),
+      prisma.post.count({
+        where: isPublished !== undefined ? { is_published: isPublished } : {},
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalPosts / pageSize);
 
     return Send.success(
       res,
       {
-        posts: allPosts,
+        posts,
+        pagination: {
+          totalPosts,
+          totalPages,
+          currentPage: pageNumber,
+          pageSize,
+          hasNextPage: pageNumber < totalPages,
+          hasPrevPage: pageNumber > 1,
+        },
       },
       "Posts successfully retrieved"
     );
@@ -64,50 +87,45 @@ const getAllPosts = async (req: Request, res: Response) => {
 
 const getAllPostsOfAUser = async (req: Request, res: Response) => {
   try {
-    const { published } = req?.query;
+    const { published, page = "1", limit = "10" } = req?.query;
     const { user_id } = req?.params;
+
+    const pageNumber = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
 
     const isPublished = published !== undefined ? true : undefined;
     if (!user_id) return;
     const userId = user_id as string;
-    const allPosts = await prisma.post.findMany({
-      where:
-        isPublished !== undefined
-          ? { is_published: isPublished, userId }
-          : { userId },
-    });
+
+    const [posts, totalPosts] = await Promise.all([
+      prisma.post.findMany({
+        where:
+          isPublished !== undefined
+            ? { is_published: isPublished, userId }
+            : { userId },
+      }),
+      prisma.post.count({
+        where:
+          isPublished !== undefined
+            ? { is_published: isPublished, userId }
+            : { userId },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalPosts / pageSize);
 
     return Send.success(
       res,
       {
-        posts: allPosts,
-      },
-      "Posts successfully retrieved"
-    );
-  } catch (error) {
-    console.error("Error while getting posts:", error);
-    return Send.error(res, {}, "Getting Posts Failed.");
-  }
-};
-
-const getAllPostsOfCurrentUser = async (req: Request, res: Response) => {
-  try {
-    const { published } = req?.query;
-    const userId = (req as any).userId;
-
-    const isPublished = published !== undefined ? true : undefined;
-
-    const allPosts = await prisma.post.findMany({
-      where:
-        isPublished !== undefined
-          ? { userId, is_published: isPublished }
-          : { userId },
-    });
-
-    return Send.success(
-      res,
-      {
-        posts: allPosts,
+        posts,
+        pagination: {
+          totalPosts,
+          totalPages,
+          currentPage: pageNumber,
+          pageSize,
+          hasNextPage: pageNumber < totalPages,
+          hasPrevPage: pageNumber > 1,
+        },
       },
       "Posts successfully retrieved"
     );
@@ -219,18 +237,45 @@ const getAllCommentsOfAPost = async (req: Request, res: Response) => {
     const { post_id } = req.params;
     if (!post_id) return;
 
-    const comments = await prisma.comment.findMany({
-      where: { postId: post_id },
-      select: {
-        id: true,
-        text: true,
-        userId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const { page = "1", limit = "10" } = req?.query;
 
-    return Send.success(res, { comments }, "Comments successfully retreived.");
+    const pageNumber = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
+
+    const [comments, totalComments] = await Promise.all([
+      prisma.comment.findMany({
+        where: { postId: post_id },
+        select: {
+          id: true,
+          text: true,
+          userId: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+
+      prisma.comment.count({
+        where: { postId: post_id },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalComments / pageSize);
+
+    return Send.success(
+      res,
+      {
+        comments,
+        pagination: {
+          totalComments,
+          totalPages,
+          currentPage: pageNumber,
+          pageSize,
+          hasNextPage: pageNumber < totalPages,
+          hasPrevPage: pageNumber > 1,
+        },
+      },
+      "Comments successfully retreived."
+    );
   } catch (error) {
     console.error("Error while getting comments of the post:", error);
     return Send.error(res, {}, "Getting Comments Failed.");
@@ -276,17 +321,43 @@ const getAllLikesOfAPost = async (req: Request, res: Response) => {
     const { post_id } = req.params;
     if (!post_id) return;
 
-    const likes = await prisma.like.findMany({
-      where: { postId: post_id },
-      select: {
-        id: true,
-        userId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+    const { page = "1", limit = "10" } = req?.query;
 
-    return Send.success(res, { likes }, "Likes successfully retreived.");
+    const pageNumber = parseInt(page as string, 10);
+    const pageSize = parseInt(limit as string, 10);
+
+    const [likes, totalLikes] = await Promise.all([
+      prisma.like.findMany({
+        where: { postId: post_id },
+        select: {
+          id: true,
+          userId: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }),
+      prisma.like.count({
+        where: { postId: post_id },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalLikes / pageSize);
+
+    return Send.success(
+      res,
+      {
+        likes,
+        pagination: {
+          totalLikes,
+          totalPages,
+          currentPage: pageNumber,
+          pageSize,
+          hasNextPage: pageNumber < totalPages,
+          hasPrevPage: pageNumber > 1,
+        },
+      },
+      "Likes successfully retreived."
+    );
   } catch (error) {
     console.error("Error while getting likes of the post:", error);
     return Send.error(res, {}, "Getting Likes Failed.");
@@ -296,7 +367,6 @@ const getAllLikesOfAPost = async (req: Request, res: Response) => {
 const postController = {
   insertNewPost,
   getAllPosts,
-  getAllPostsOfCurrentUser,
   getAllPostsOfAUser,
   updatePost,
   deletePost,
