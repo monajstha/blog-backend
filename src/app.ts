@@ -17,7 +17,7 @@ app.use(methodOverride("_method")); // look for ?_method=PUT in POST requests
 app.use(
   cors({
     origin: [
-      "http://localhost:3000", // your frontend url
+      "http://localhost:5173", // your frontend url
       // 'https://mywebsite.com' // your production url optional
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],

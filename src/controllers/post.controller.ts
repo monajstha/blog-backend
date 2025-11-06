@@ -1,5 +1,4 @@
 import { prisma } from "@db/index";
-import { Post } from "@prisma/client";
 import Send from "@utils/response.utils";
 import { Request, Response } from "express";
 

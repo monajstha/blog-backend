@@ -1,7 +1,6 @@
 import Send from "@utils/response.utils";
 import { prisma } from "@db/index";
 import { Request, Response } from "express";
-import { send } from "process";
 
 const getUser = async (req: Request, res: Response) => {
   try {

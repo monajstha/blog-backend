@@ -16,13 +16,13 @@ const login = async (req: Request, res: Response) => {
     });
     // If user doesn't exist, return an error
     if (!user) {
-      return Send.error(res, null, "Invalid Credentials");
+      return Send.unauthorized(res, null, "User not found");
     }
 
     // 2. Compare the provided password with the hashed password in the database
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return Send.error(res, null, "Invalid Credentials");
+      return Send.unauthorized(res, null, "Invalid Credentials");
     }
 
     // 3. Generate an access token (JWT) with a short expiration time (e.g. 15 minutes)
